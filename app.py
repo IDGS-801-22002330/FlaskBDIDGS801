@@ -11,10 +11,24 @@ app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
 csrf = CSRFProtect(app)  # Initialize CSRFProtect with the app
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 @app.route("/index")
 def index():
+    create_forms = forms.UserForm2(request.form)
+    alumno=Alumnos.query.all()
+    return render_template("index.html", form=create_forms, alumnos=alumno)
     return render_template("index.html")
+
+@app.route("/detalles",methods=["GET", "POST"])
+def detalles():
+    if request.method=="GET":
+        id=request.args.get("id")
+        alum=db.session.query(Alumnos).filter(Alumnos.id==id).first()
+        id=request.args.get("id")
+        nombre=alum.nombre
+        apaterno=alum.apaterno
+        email=alum.email
+    return render_template("detalles.html", id=id, nombre=nombre,apaterno=apaterno,email=email, alum=alum)
 
 @app.route("/alumnos", methods=["GET", "POST"])
 def alumnos():
